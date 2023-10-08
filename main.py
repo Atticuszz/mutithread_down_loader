@@ -40,8 +40,10 @@ class Downloader:
         response = requests.get(url, headers=custom_headers, stream=True)
 
         if response.status_code == 416:
-            with self.download_progress:
-                self._single_handler(url)
+
+            self.completed.add(url)
+            self.download_progress.update(global_task_id, advance=1)
+            self.partial_done.set()
         elif response.status_code == 200 or response.status_code == 206:
 
             # 初始化时间和已下载的字节数
@@ -117,7 +119,7 @@ class Downloader:
         self.all_tasks_done.wait()
 
     def start_downloading(self, max_workers=10):
-        with ThreadPoolExecutor(max_workers=300) as executor:
+        with ThreadPoolExecutor(max_workers=200) as executor:
             futures = []
             # 刚开始运行8个
             for index, url in enumerate(self.urls[:max_workers]):
@@ -154,7 +156,7 @@ if __name__ == "__main__":
         filename="Overall Progress",
         speed="0.00",
         file_size="0.00/0.00 MB")
-
-    downloader = Downloader(src.urls, downloads_progress)
+    save_folder = "C:\\Users\\18317\\OneDrive\\图片\\python_download"
+    downloader = Downloader(src.urls, downloads_progress, save_folder)
     downloader.start_downloading()
     print("\nAll downloads completed.")

@@ -16,4 +16,4 @@ custom_columns = [
 
 ]
 
-downloads_progress = Progress(*custom_columns, auto_refresh=True, expand=True, transient=True)
+downloads_progress = Progress(*custom_columns, auto_refresh=True)
